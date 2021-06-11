@@ -41,12 +41,3 @@ Feature: Employee reimbursement requests
 #         Y'know an employee is logged into the employee portal
 #         It's just unbelievable the view reimbursements button is clicked
 #         But at the end of the day I reckon the browser navigates to the reimbursements page
-
-# OH HAI: View reimbursements
-
-#     An employee can login to see their own reimbursements, past and pending
-
-#     MISHUN: Navigate to reimbursements page
-#         I CAN HAZ an employee is logged into the employee portal
-#         WEN the view reimbursements button is clicked
-#         DEN the browser navigates to the reimbursements page
