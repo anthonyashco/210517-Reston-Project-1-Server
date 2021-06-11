@@ -11,7 +11,7 @@ def create_routes(app: Flask):
     def test_form():
         return app.send_static_file("main.html"), 200
 
-    @app.route("/form_input", methods=["POST"])
+    @app.route("/form", methods=["POST"])
     def input_data():
         name = request.form["name"]
         starter = request.form["starter"]
