@@ -4,7 +4,6 @@ from typing import List
 
 
 class FileDAO():
-    # TODO: Unittests
 
     @staticmethod
     def create(cursor, file: File) -> File:
