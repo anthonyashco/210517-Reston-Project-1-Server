@@ -1,3 +1,4 @@
+from copy import copy
 from daos.user_dao import UserDAO as u
 from entities.user import User
 from exceptions import ResourceNotFound
@@ -16,7 +17,8 @@ conn = Connection.conn
 def test_create():
     with conn:
         with conn.cursor() as cursor:
-            created = u.create(cursor, USER_1)
+            created = copy(USER_1)
+            created = u.create(cursor, created)
             assert created.id is not None
             conn.rollback()
 
@@ -25,8 +27,8 @@ def test_get_from_email():
     with conn:
         with conn.cursor() as cursor:
             u.create(cursor, USER_1)
-            email = u.get_from_email(cursor, "test_1@fake.email")
-            assert email.first_name == "Testy"
+            email = u.get_from_email(cursor, USER_1.email)
+            assert email.first_name == USER_1.first_name
             conn.rollback()
 
 
@@ -44,7 +46,8 @@ def test_get_all():
 def test_update():
     with conn:
         with conn.cursor() as cursor:
-            updated = u.create(cursor, USER_1)
+            updated = copy(USER_1)
+            updated = u.create(cursor, updated)
             updated.status = "closed"
             u.update(cursor, updated)
             updated_2 = u.get_from_id(cursor, updated.id)
@@ -55,7 +58,8 @@ def test_update():
 def test_delete():
     with conn:
         with conn.cursor() as cursor:
-            deleted = u.create(cursor, USER_1)
+            deleted = copy(USER_1)
+            deleted = u.create(cursor, deleted)
             u.delete(cursor, deleted)
             with pytest.raises(ResourceNotFound):
                 u.get_from_id(cursor, deleted.id)
