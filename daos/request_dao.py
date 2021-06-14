@@ -4,7 +4,6 @@ from typing import List
 
 
 class RequestDAO():
-    # TODO: Unittests
 
     @staticmethod
     def create(cursor, request: Request) -> Request:
