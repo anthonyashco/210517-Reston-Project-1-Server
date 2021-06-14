@@ -12,11 +12,12 @@ class FileDAO():
             insert into
                 expense.file
             values
-                (default, %s, %s, %s, %s)
+                (default, %s, %s, %s, %s, %s, %s)
             returning
                 id"""
         cursor.execute(smt, [
-            file.employee_id, file.request_id, file.uploaded, file.upload_time
+            file.employee_id, file.request_id, file.filename, file.ext,
+            file.uploaded, file.upload_time
         ])
         file.id = cursor.fetchone()[0]
         return file
@@ -56,13 +57,13 @@ class FileDAO():
             update
                 expense.file
             set
-                employee_id = %s, request_id = %s, uploaded = %s,
-                upload_time = %s
+                employee_id = %s, request_id = %s, filename = %s,
+                ext = %s, uploaded = %s, upload_time = %s
             where
                 id = %s"""
         cursor.execute(smt, [
-            file.employee_id, file.request_id, file.uploaded, file.upload_time,
-            file.id
+            file.employee_id, file.request_id, file.filename, file.ext,
+            file.uploaded, file.upload_time, file.id
         ])
         if cursor.rowcount == 0:
             raise ResourceNotFound(f"File with id of {file.id} not found.")
