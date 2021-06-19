@@ -1,4 +1,5 @@
 from copy import copy
+from datetime import datetime
 from daos.file_dao import FileDAO as f
 from daos.request_dao import RequestDAO as r
 from daos.user_dao import UserDAO as u
@@ -10,7 +11,8 @@ from utils.connection import Connection
 USER = User(None, "test_1@fake.email", "153417bd132637ba71cf236c323a55bd",
             "71a8b28bf9986f51ab5e31c1c20993f3", "Testy", "McTestFace",
             "employee")
-REQUEST = Request(None, 0, 200.00, "Cute Raichu NFT", None, None, None, None)
+REQUEST = Request(None, 0, 200.00, [(0, "Cute Raichu NFT", datetime.now())],
+                  None, None, None, None)
 
 with open("tests/files/raichu_stretch.gif", "rb") as x:
     filename = x.name.rpartition("/")[2].rpartition(".")[0]

@@ -1,4 +1,7 @@
 from __future__ import annotations
+from datetime import datetime, timedelta
+from flask import current_app
+import jwt
 
 
 class User():
@@ -32,6 +35,23 @@ class User():
             "last_name": self.last_name,
             "status": self.status
         }
+
+    def encode_auth_token(self) -> str:
+        payload = {
+            "exp": datetime.utcnow() + timedelta(hours=1),
+            "iat": datetime.utcnow(),
+            "sub": self.id,
+        }
+        return jwt.encode(payload,
+                          current_app.config["SECRET_KEY"],
+                          algorithm="HS256")
+
+    @staticmethod
+    def decode_auth_token(auth_token: str):
+        payload = jwt.decode(auth_token,
+                             current_app.config["SECRET_KEY"],
+                             algorithms=["HS256"])
+        return payload["sub"]
 
     @staticmethod
     def from_json(json: dict) -> User:

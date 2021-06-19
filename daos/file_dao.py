@@ -32,7 +32,17 @@ class FileDAO():
         return files[0]
 
     @staticmethod
-    def get_from_request_id(cursor, request_id: int) -> File:
+    def get_filenames_from_request_id(cursor, request_id: int) -> List[str]:
+        smt = "select id, filename, ext from expense.file where request_id = %s"
+        cursor.execute(smt, [request_id])
+        records = cursor.fetchall()
+        if len(records) == 0:
+            raise ResourceNotFound(
+                f"File with request id {request_id} not found.")
+        return [f"{record[0]}: {record[1]}.{record[2]}" for record in records]
+
+    @staticmethod
+    def get_from_request_id(cursor, request_id: int) -> List[File]:
         smt = "select * from expense.file where request_id = %s"
         cursor.execute(smt, [request_id])
         records = cursor.fetchall()
@@ -40,7 +50,7 @@ class FileDAO():
         if len(files) == 0:
             raise ResourceNotFound(
                 f"File with request id {request_id} not found.")
-        return files[0]
+        return files
 
     @staticmethod
     def get_all(cursor) -> List[File]:
