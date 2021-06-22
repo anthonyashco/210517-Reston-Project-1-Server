@@ -26,7 +26,7 @@ create table expense.request (
 	employee_id int not null,
 	request_amount numeric not null
 		check (request_amount > 0),
-	request_details detail_entry[],
+	request_details expense.detail_entry[],
 	manager_id int default null,
 	decision boolean default null,
 	transaction_time timestamptz default current_timestamp,

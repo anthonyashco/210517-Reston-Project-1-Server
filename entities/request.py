@@ -5,7 +5,6 @@ from typing import List, Tuple
 
 
 class Request():
-
     def __init__(self,
                  request_id: int = 0,
                  employee_id: int = None,
@@ -18,8 +17,8 @@ class Request():
         self.id = request_id
         self.employee_id = employee_id
         self.request_amount = request_amount
-        self.request_details = request_details
-        for index, request in enumerate(self.request_details):
+        self.request_details = []
+        for request in request_details:
             if type(request) == dict:
                 if type(request["post_time"]) == str:
                     time = request["post_time"]
@@ -29,7 +28,7 @@ class Request():
                         time = (f"{time.rpartition('.')[0]}"
                                 f".{micro}-{time.rpartition('-')[2]}")
                     request["post_time"] = datetime.fromisoformat(time)
-                self.request_details[index] = (tuple(request.values()))
+                self.request_details.append(tuple(request.values()))
         self.manager_id = manager_id
         self.decision = decision
         self.transaction_time = transaction_time

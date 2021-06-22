@@ -10,13 +10,13 @@ from flask import Flask, request, jsonify, send_file
 from services.employee import EmployeeService
 import functools
 import io
+import json
 import jwt
 
 e = EmployeeService(FileDAO, RequestDAO, UserDAO)
 
 
 def check_errors(func):
-
     @functools.wraps(func)
     def wrapper_check_errors(*args, **kwargs):
         try:
@@ -34,7 +34,6 @@ def check_errors(func):
 
 
 def create_routes(app: Flask):
-
     @app.route("/employee/user", methods=["GET"])
     @check_errors
     def e_get_user():
@@ -55,7 +54,7 @@ def create_routes(app: Flask):
     @check_errors
     def e_post_request():
         token = request.headers["token"]
-        form = request.form
+        form = json.loads(request.data.decode("utf-8"))
         usr_id = User.decode_auth_token(token)
         req = Request(0, usr_id, float(form["amount"]))
         req.add_comment(usr_id, form["comment"])
@@ -65,7 +64,7 @@ def create_routes(app: Flask):
     @check_errors
     def e_update_request():
         token = request.headers["token"]
-        form = request.form
+        form = json.loads(request.data.decode("utf-8"))
         usr_id = User.decode_auth_token(token)
         req_id = form["req_id"]
         req = e.get_user_specific_request(usr_id, req_id)
@@ -76,9 +75,8 @@ def create_routes(app: Flask):
     @check_errors
     def e_read_comments():
         token = request.headers["token"]
-        form = request.form
         usr_id = User.decode_auth_token(token)
-        req_id = int(form["req_id"])
+        req_id = request.headers["req_id"]
         req = e.get_user_specific_request(usr_id, req_id)
         return jsonify(e.read_comments(req)), 200
 
@@ -86,7 +84,7 @@ def create_routes(app: Flask):
     @check_errors
     def e_add_comment():
         token = request.headers["token"]
-        form = request.form
+        form = json.loads(request.data.decode("utf-8"))
         usr_id = User.decode_auth_token(token)
         req_id = int(form["req_id"])
         req = e.get_user_specific_request(usr_id, req_id)
@@ -96,7 +94,7 @@ def create_routes(app: Flask):
     @check_errors
     def e_edit_comment():
         token = request.headers["token"]
-        form = request.form
+        form = json.loads(request.data.decode("utf-8"))
         usr_id = User.decode_auth_token(token)
         req_id = int(form["req_id"])
         req = e.get_user_specific_request(usr_id, req_id)
@@ -108,7 +106,8 @@ def create_routes(app: Flask):
     def e_post_image():
         token = request.headers["token"]
         usr_id = User.decode_auth_token(token)
-        req_id = int(request.form["req_id"])
+        form = request.form
+        req_id = int(form["req_id"])
         req = e.get_user_specific_request(usr_id, req_id)
         files = request.files.getlist("images")
         success = []
@@ -126,7 +125,8 @@ def create_routes(app: Flask):
     def e_get_image_filenames():
         token = request.headers["token"]
         usr_id = User.decode_auth_token(token)
-        req_id = int(request.form["req_id"])
+        form = request.form
+        req_id = int(form["req_id"])
         req = e.get_user_specific_request(usr_id, req_id)
         return jsonify(e.get_filenames_from_request(req.id)), 200
 
@@ -135,7 +135,8 @@ def create_routes(app: Flask):
     def e_get_image():
         token = request.headers["token"]
         usr_id = User.decode_auth_token(token)
-        fil_id = int(request.form["fil_id"])
+        form = request.form
+        fil_id = int(form["fil_id"])
         fil = e.get_user_specific_file(usr_id, fil_id)
         if fil.ext == "jpg":
             fil.ext = "jpeg"

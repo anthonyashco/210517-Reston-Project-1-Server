@@ -1,8 +1,0 @@
-# language: en-lol
-
-OH HAI: I SHOW OFF BEHAVE
-
-    MISHUN: IS RUN TEST
-        I CAN HAZ INSTALL BEHAVE?
-        WEN I TEST
-        DEN BEHAVE DO TEST!

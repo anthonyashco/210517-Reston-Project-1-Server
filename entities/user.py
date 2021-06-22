@@ -5,7 +5,6 @@ import jwt
 
 
 class User():
-
     def __init__(self,
                  user_id: int = 0,
                  email: str = None,
@@ -42,9 +41,12 @@ class User():
             "iat": datetime.utcnow(),
             "sub": self.id,
         }
-        return jwt.encode(payload,
-                          current_app.config["SECRET_KEY"],
-                          algorithm="HS256")
+        try:
+            return jwt.encode(payload,
+                              current_app.config["SECRET_KEY"],
+                              algorithm="HS256")
+        except Exception as e:
+            print(e)
 
     @staticmethod
     def decode_auth_token(auth_token: str):

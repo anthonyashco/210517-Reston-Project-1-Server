@@ -9,6 +9,7 @@ import yaml
 
 def create_app():
     app = Flask(__name__, static_url_path="/static")
+    app.debug = True
 
     if exists("settings.yml"):
         with open("settings.yml") as f:

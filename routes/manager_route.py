@@ -8,13 +8,13 @@ from flask import Flask, request, jsonify, send_file
 from services.manager import ManagerService
 import functools
 import io
+import json
 import jwt
 
 m = ManagerService(FileDAO, RequestDAO, UserDAO)
 
 
 def check_errors(func):
-
     @functools.wraps(func)
     def wrapper_check_errors(*args, **kwargs):
         try:
@@ -40,7 +40,6 @@ def is_manager(token) -> User:
 
 
 def create_routes(app: Flask):
-
     @app.route("/manager/user", methods=["GET"])
     @check_errors
     def m_get_user():
@@ -52,7 +51,8 @@ def create_routes(app: Flask):
     @check_errors
     def m_get_requests():
         is_manager(request.headers["token"])
-        return jsonify([request.to_json() for request in m.get_requests()]), 200
+        return jsonify([request.to_json()
+                        for request in m.get_requests()]), 200
 
     @app.route("/manager/request/pending", methods=["GET"])
     @check_errors
@@ -64,14 +64,14 @@ def create_routes(app: Flask):
     @check_errors
     def m_get_completed():
         is_manager(request.headers["token"])
-        return jsonify([request.to_json() for request in m.get_completed()
-                       ]), 200
+        return jsonify([request.to_json()
+                        for request in m.get_completed()]), 200
 
     @app.route("/manager/request", methods=["PATCH"])
     @check_errors
     def m_update_request():
         is_manager(request.headers["token"])
-        form = request.form
+        form = json.loads(request.data.decode("utf-8"))
         req_id = form["req_id"]
         req = m.get_request(req_id)
         req.request_amount = float(form["req_amount"])
@@ -80,17 +80,14 @@ def create_routes(app: Flask):
     @app.route("/manager/comment", methods=["GET"])
     @check_errors
     def m_read_comments():
-        is_manager(request.headers["token"])
-        form = request.form
-        req_id = int(form["req_id"])
-        req = m.get_request(req_id)
+        req = request.headers("req_id")
         return jsonify(m.read_comments(req)), 200
 
     @app.route("/manager/comment", methods=["POST"])
     @check_errors
     def m_add_comment():
         usr = is_manager(request.headers["token"])
-        form = request.form
+        form = json.loads(request.data.decode("utf-8"))
         req_id = int(form["req_id"])
         req = m.get_request(req_id)
         return m.add_comment(req, usr.id, form["comment"]).to_json(), 200
@@ -99,7 +96,7 @@ def create_routes(app: Flask):
     @check_errors
     def m_edit_comment():
         usr = is_manager(request.headers["token"])
-        form = request.form
+        form = json.loads(request.data.decode("utf-8"))
         req_id = int(form["req_id"])
         index = int(form["index"])
         req = m.get_request(req_id)
@@ -110,7 +107,8 @@ def create_routes(app: Flask):
     @check_errors
     def m_get_image_filenames():
         is_manager(request.headers["token"])
-        req_id = int(request.form["req_id"])
+        form = json.loads(request.data.decode("utf-8"))
+        req_id = int(form["req_id"])
         req = m.get_request(req_id)
         return jsonify(m.get_filenames_from_request(req.id)), 200
 
@@ -118,7 +116,8 @@ def create_routes(app: Flask):
     @check_errors
     def m_get_image():
         is_manager(request.headers["token"])
-        fil_id = int(request.form["fil_id"])
+        form = json.loads(request.data.decode("utf-8"))
+        fil_id = int(form["fil_id"])
         fil = m.get_file(fil_id)
         if fil.ext == "jpg":
             fil.ext = "jpeg"
@@ -130,10 +129,11 @@ def create_routes(app: Flask):
     @check_errors
     def m_decision():
         usr = is_manager(request.headers["token"])
-        req = m.get_request(request.form["req_id"])
-        if request.form["decision"] == "approve":
+        form = json.loads(request.data.decode("utf-8"))
+        req = m.get_request(form["req_id"])
+        if form["decision"] == "approve":
             req.decision = True
-        elif request.form["decision"] == "deny":
+        elif form["decision"] == "deny":
             req.decision = False
         else:
             raise ValueError
